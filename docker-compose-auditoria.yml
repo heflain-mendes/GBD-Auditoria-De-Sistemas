@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:latest
+    container_name: auditoria-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: auditoria
+      MYSQL_ROOT_PASSWORD: letmein
+    ports:
+      - "9999:3306"
+    volumes:
+      - db:/var/lib/mysql
+      #- ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  db:
+    driver: local
