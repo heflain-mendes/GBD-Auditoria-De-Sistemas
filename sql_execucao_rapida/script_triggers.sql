@@ -1,6 +1,6 @@
 -- Triggers de Auditoria
 -- Update
-CREATE TRIGGER Aud_Ins_manutencao
+CREATE TRIGGER IF NOT EXISTS Aud_Ins_manutencao
 BEFORE INSERT ON `alegreMaisLimpo`.`manutencao` FOR EACH ROW 
 BEGIN
 set
@@ -81,7 +81,7 @@ values(
 );
 END; 
 
-CREATE TRIGGER Aud_Upd_manutencao
+CREATE TRIGGER IF NOT EXISTS Aud_Upd_manutencao
 BEFORE UPDATE  ON `alegreMaisLimpo`.`manutencao` FOR EACH ROW 
 BEGIN
 set
@@ -221,7 +221,7 @@ IF OLD.valor <> NEW.valor then
 end if;
 END;
 
-CREATE TRIGGER Aud_Del_manutencao
+CREATE TRIGGER IF NOT EXISTS Aud_Del_manutencao
 BEFORE DELETE ON `alegreMaisLimpo`.`manutencao` FOR EACH ROW 
 BEGIN
 set
@@ -303,7 +303,7 @@ values(
 END; 
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-CREATE TRIGGER Aud_Ins_auxiliarEscala
+CREATE TRIGGER IF NOT EXISTS Aud_Ins_auxiliarEscala
 BEFORE INSERT ON `alegreMaisLimpo`.`auxiliarEscala` FOR EACH ROW 
 BEGIN
 set
@@ -356,7 +356,7 @@ values(
 );
 END; 
 
-CREATE TRIGGER Aud_upd_auxiliarEscala 
+CREATE TRIGGER IF NOT EXISTS Aud_upd_auxiliarEscala 
 BEFORE UPDATE ON `alegreMaisLimpo`.`auxiliarEscala` FOR EACH ROW 
 BEGIN
 set
@@ -420,8 +420,9 @@ Auditoria.transacao_data (
     NEW.idEscala
 );
 end if;
-END;  
-CREATE TRIGGER Aud_Del_auxiliarEscala
+END;
+
+CREATE TRIGGER IF NOT EXISTS Aud_Del_auxiliarEscala
 BEFORE DELETE ON `alegreMaisLimpo`.`auxiliarEscala` FOR EACH ROW 
 BEGIN
 set
@@ -476,7 +477,7 @@ END;
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 DELIMITER 
-CREATE TRIGGER Aud_Ins_zona
+CREATE TRIGGER IF NOT EXISTS Aud_Ins_zona
 BEFORE INSERT ON `alegreMaisLimpo`.`zona` FOR EACH ROW 
 BEGIN
 set
@@ -529,7 +530,7 @@ values(
 );
 END; 
 
-CREATE TRIGGER Aud_upd_zona
+CREATE TRIGGER IF NOT EXISTS Aud_upd_zona
 BEFORE UPDATE ON `alegreMaisLimpo`.`zona` FOR EACH ROW 
 BEGIN
 set
@@ -595,7 +596,7 @@ Auditoria.transacao_data (
 END if;
 END;  
 
-CREATE TRIGGER Aud_Del_zona
+CREATE TRIGGER IF NOT EXISTS Aud_Del_zona
 BEFORE DELETE ON `alegreMaisLimpo`.`zona` FOR EACH ROW 
 BEGIN
 set
