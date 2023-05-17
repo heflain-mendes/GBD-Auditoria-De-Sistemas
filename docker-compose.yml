@@ -3,7 +3,7 @@ services:
   db:
     image: mysql:latest
     container_name: auditoria-mysql
-    restart: always
+    restart: no
     environment:
       MYSQL_DATABASE: auditoria
       MYSQL_ROOT_PASSWORD: letmein
