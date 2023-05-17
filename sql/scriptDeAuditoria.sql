@@ -3,22 +3,6 @@ CREATE DATABASE IF NOT EXISTS `Auditoria`;
 use `Auditoria`;
 
 -- Dicionário de dados
-DROP TABLE IF EXISTS `Auditoria`.`data_campo`;
-
-CREATE TABLE `Auditoria`.`data_campo` (
-    `CodCampo` INT(10) unsigned NOT NULL AUTO_INCREMENT,
-    `NmCampo` VARCHAR(45) NOT NULL,
-    `TipoCampo` VARCHAR(45) NOT NULL,
-    `TipoChave` VARCHAR(45) NOT NULL,
-    `Auditar` BOOLEAN NOT NULL DEFAULT false,
-    `CodTabela` INT(10) unsigned NOT NULL DEFAULT '0',
-    `SeqCampo` INT(10) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY (`CodCampo`),
-    CONSTRAINT `data_campo_ibfk_1` FOREIGN KEY `data_campo_ibfk_1` (`CodTabela`) REFERENCES `Auditoria`.`data_tabela` (`CodTabela`) ON DELETE RESTRICT ON UPDATE RESTRICT
-);
-
-DROP TABLE IF EXISTS `Auditoria`.`data_tabela`;
-
 CREATE TABLE `Auditoria`.`data_tabela` (
     `CodTabela` INT(10) unsigned NOT NULL AUTO_INCREMENT,
     `NmTabela` VARCHAR(45) NULL,
@@ -32,8 +16,22 @@ CREATE TABLE `Auditoria`.`data_tabela` (
     PRIMARY KEY (`CodTabela`)
 );
 
+CREATE TABLE `Auditoria`.`data_campo` (
+    `CodCampo` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+    `NmCampo` VARCHAR(45) NOT NULL,
+    `TipoCampo` VARCHAR(45) NOT NULL,
+    `TipoChave` VARCHAR(45) NOT NULL,
+    `Auditar` BOOLEAN NOT NULL DEFAULT false,
+    `CodTabela` INT(10) unsigned NOT NULL DEFAULT '0',
+    `SeqCampo` INT(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`CodCampo`),
+    CONSTRAINT `data_campo_ibfk_1` FOREIGN KEY `data_campo_ibfk_1` (`CodTabela`) REFERENCES `Auditoria`.`data_tabela` (`CodTabela`) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+
+
 -- Store procedure para o povoamento do dicionário de dados
-DELIMITER || DROP PROCEDURE IF EXISTS `Auditoria`.`SP_Data_tabela`;
+DELIMITER ||
 
 CREATE DEFINER = `root` @`localhost` PROCEDURE `SP_Data_tabela`(in Pschema varchar(45)) begin DECLARE PNmTabela VarCHAR(45);
 
@@ -81,8 +79,7 @@ END;
 
 || DELIMITER;
 
-DELIMITER || DROP PROCEDURE IF EXISTS `Auditoria`.`SP_Data_Campo`;
-
+DELIMITER || 
 CREATE DEFINER = `root` @`localhost` PROCEDURE `SP_Data_Campo`() begin DECLARE PNmColuna VarCHAR(45);
 
 DECLARE PNmTipoColuna VarCHAR(45);
@@ -149,29 +146,24 @@ END;
 || DELIMITER;
 
 -- Tabela de Auditoria
-CREATE DATABASE IF NOT EXISTS `Auditoria`;
-
-DROP TABLE IF EXISTS `Auditoria`.`transacao`;
 
 CREATE TABLE `Auditoria`.`transacao` (
     `T_ID` VARCHAR(37) NOT NULL DEFAULT '',
-    `T_ACAO` INT(11) NOT NULL DEFAULT '0',
+    `T_ACAO` INT NOT NULL DEFAULT '0',
     `T_HOST` VARCHAR(15) NOT NULL,
     `T_USER_BANCO` VARCHAR(30) NOT NULL,
-    `T_USER_APLICACAO` INT(11) NOT NULL DEFAULT '0',
+    `T_USER_APLICACAO` INT NOT NULL DEFAULT '0',
     `T_DATA` DATETIME NOT NULL,
     `T_TABELA` VARCHAR(45) NOT NULL,
     `T_BANCO` VARCHAR(45) NOT NULL,
     PRIMARY KEY (`T_ID`)
 );
 
-DROP TABLE IF EXISTS `Auditoria`.`transacao_data`;
-
 CREATE TABLE `Auditoria`.`transacao_data` (
     `TD_ID` VARCHAR(37) NOT NULL DEFAULT '',
     `T_ID` VARCHAR(37) NOT NULL DEFAULT '',
     `TD_CAMPO` VARCHAR(45) NOT NULL DEFAULT '',
-    `TD_CHAVE` INT(11) NOT NULL DEFAULT '0',
+    `TD_CHAVE` INT NOT NULL DEFAULT '0',
     `TD_OLD_VALOR` VARCHAR(255),
     `TD_NEW_VALOR` VARCHAR(255),
     PRIMARY KEY (`TD_ID`),
@@ -179,202 +171,14 @@ CREATE TABLE `Auditoria`.`transacao_data` (
     CONSTRAINT `transacao_data_ibfk_1` FOREIGN KEY `transacao_data_ibfk_1` (`T_ID`) REFERENCES `Auditoria`.`transacao` (`T_ID`) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-DROP TABLE IF EXISTS `Auditoria`.`transacao_data_blob`;
-
 CREATE TABLE `Auditoria`.`transacao_data_blob` (
     `TDB_ID` VARCHAR(37) NOT NULL DEFAULT '',
     `T_ID` VARCHAR(37) NOT NULL DEFAULT '',
     `TDB_CAMPO` VARCHAR(45) NOT NULL DEFAULT '',
-    `TDB_CHAVE` INT(11) NOT NULL DEFAULT '0',
+    `TDB_CHAVE` INT NOT NULL DEFAULT '0',
     `TDB_OLD_VALOR` BLOB,
     `TDB_NEW_VALOR` BLOB,
     PRIMARY KEY (`TDB_ID`),
     INDEX `T_ID` (`T_ID`),
     CONSTRAINT `transacao_data_blob_ibfk_1` FOREIGN KEY `transacao_data_blob_ibfk_1` (`T_ID`) REFERENCES `Auditoria`.`transacao` (`T_ID`) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
-
--- Triggers de Auditoria
-DELIMITER || 
-CREATE TRIGGER Aud_Upd_funcionario BEFORE
-UPDATE
-    ON FolhaPagamento.funcionario FOR EACH ROW BEGIN
-set
-    @T_ID = UUID();
-
-INSERT INTO
-    Auditoria.transacao(
-        T_ID,
-        T_ACAO,
-        T_HOST,
-        T_USER_BANCO,
-        T_USER_APLICACAO,
-        T_DATA,
-        T_TABELA,
-        T_BANCO
-    )
-values
-    (
-        @T_ID,
-        2,
-        @host,
-        user(),
-        @iduser,
-        now(),
-        'funcionario',
-        'FolhaPagamento'
-    );
-
-INSERT INTO
-    Auditoria.transacao_data (
-        TD_ID,
-        T_ID,
-        TD_CAMPO,
-        TD_CHAVE,
-        TD_OLD_VALOR,
-        TD_NEW_VALOR
-    )
-values
-    (
-        UUID(),
-        @T_ID,
-        'CodFuncionario',
-        1,
-        OLD.CodFuncionario,
-        NEW.CodFuncionario
-    );
-
-IF OLD.NmFuncionario <> NEW.NmFuncionario then
-INSERT INTO
-    Auditoria.transacao_data (
-        TD_ID,
-        T_ID,
-        TD_CAMPO,
-        TD_CHAVE,
-        TD_OLD_VALOR,
-        TD_NEW_VALOR
-    )
-values
-    (
-        UUID(),
-        @T_ID,
-        'NmFuncionario',
-        3,
-        OLD.NmFuncionario,
-        NEW.NmFuncionario
-    );
-
-end if;
-
-IF OLD.CodDepartamento <> NEW.CodDepartamento then
-INSERT INTO
-    Auditoria.transacao_data (
-        TD_ID,
-        T_ID,
-        TD_CAMPO,
-        TD_CHAVE,
-        TD_OLD_VALOR,
-        TD_NEW_VALOR
-    )
-values
-    (
-        UUID(),
-        @T_ID,
-        'CodDepartamento',
-        3,
-        OLD.CodDepartamento,
-        NEW.CodDepartamento
-    );
-
-end if;
-
-END;
-
-|| DELIMITER;
-
-DELIMITER || CREATE TRIGGER Aud_Del_funcionario BEFORE DELETE ON FolhaPagamento.funcionario FOR EACH ROW BEGIN
-set
-    @T_ID = UUID();
-
-INSERT INTO
-    Auditoria.transacao(
-        T_ID,
-        T_ACAO,
-        T_HOST,
-        T_USER_BANCO,
-        T_USER_APLICACAO,
-        T_DATA,
-        T_TABELA,
-        T_BANCO
-    )
-values
-(
-        @T_ID,
-        3,
-        @host,
-        user(),
-        @iduser,
-        now(),
-        'funcionario',
-        'FolhaPagamento'
-    );
-
-INSERT INTO
-    Auditoria.transacao_data (
-        TD_ID,
-        T_ID,
-        TD_CAMPO,
-        TD_CHAVE,
-        TD_OLD_VALOR,
-        TD_NEW_VALOR
-    )
-values
-(
-        UUID(),
-        @T_ID,
-        'CodFuncionario',
-        1,
-        OLD.CodFuncionario,
-        NULL
-    );
-
-INSERT INTO
-    Auditoria.transacao_data (
-        TD_ID,
-        T_ID,
-        TD_CAMPO,
-        TD_CHAVE,
-        TD_OLD_VALOR,
-        TD_NEW_VALOR
-    )
-values
-(
-        UUID(),
-        @T_ID,
-        'NmFuncionario',
-        3,
-        OLD.NmFuncionario,
-        NULL
-    );
-
-INSERT INTO
-    Auditoria.transacao_data (
-        TD_ID,
-        T_ID,
-        TD_CAMPO,
-        TD_CHAVE,
-        TD_OLD_VALOR,
-        TD_NEW_VALOR
-    )
-values
-(
-        UUID(),
-        @T_ID,
-        'CodDepartamento',
-        3,
-        OLD.CodDepartamento,
-        NULL
-    );
-
-END;
-
-|| DELIMITER;

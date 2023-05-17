@@ -1,6 +1,4 @@
--- Triggers de Auditoria
--- Update
-CREATE TRIGGER IF NOT EXISTS Aud_Ins_manutencao
+CREATE TRIGGER Aud_Ins_manutencao
 BEFORE INSERT ON `alegreMaisLimpo`.`manutencao` FOR EACH ROW 
 BEGIN
 set
@@ -81,7 +79,7 @@ values(
 );
 END; 
 
-CREATE TRIGGER IF NOT EXISTS Aud_Upd_manutencao
+CREATE TRIGGER Aud_Upd_manutencao
 BEFORE UPDATE  ON `alegreMaisLimpo`.`manutencao` FOR EACH ROW 
 BEGIN
 set
@@ -194,7 +192,7 @@ IF OLD.descricao <> NEW.descricao then
     ) values (
         UUID(),
         @T_ID,
-        'descricaodescricao',
+        'descricao',
         3,
         OLD.descricao,
         NEW.descricao
@@ -221,7 +219,7 @@ IF OLD.valor <> NEW.valor then
 end if;
 END;
 
-CREATE TRIGGER IF NOT EXISTS Aud_Del_manutencao
+CREATE TRIGGER Aud_Del_manutencao
 BEFORE DELETE ON `alegreMaisLimpo`.`manutencao` FOR EACH ROW 
 BEGIN
 set
@@ -303,7 +301,7 @@ values(
 END; 
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-CREATE TRIGGER IF NOT EXISTS Aud_Ins_auxiliarEscala
+CREATE TRIGGER Aud_Ins_auxiliarEscala
 BEFORE INSERT ON `alegreMaisLimpo`.`auxiliarEscala` FOR EACH ROW 
 BEGIN
 set
@@ -342,21 +340,21 @@ Auditoria.transacao_data (
 values(
     UUID(),
     @T_ID,
-    '',
+    'idAuxiliar',
     1,
     null,
     NEW.idAuxiliar
 ),(
     UUID(),
     @T_ID,
-    '',
+    'idEscala',
     1,
     null,
     NEW.idEscala
 );
 END; 
 
-CREATE TRIGGER IF NOT EXISTS Aud_upd_auxiliarEscala 
+CREATE TRIGGER Aud_upd_auxiliarEscala 
 BEFORE UPDATE ON `alegreMaisLimpo`.`auxiliarEscala` FOR EACH ROW 
 BEGIN
 set
@@ -420,9 +418,9 @@ Auditoria.transacao_data (
     NEW.idEscala
 );
 end if;
-END;
+END;  
 
-CREATE TRIGGER IF NOT EXISTS Aud_Del_auxiliarEscala
+CREATE TRIGGER Aud_Del_auxiliarEscala
 BEFORE DELETE ON `alegreMaisLimpo`.`auxiliarEscala` FOR EACH ROW 
 BEGIN
 set
@@ -461,14 +459,14 @@ Auditoria.transacao_data (
 values(
     UUID(),
     @T_ID,
-    '',
+    'idAuxiliar',
     1,
     OLD.idAuxiliar,
     null
 ),(
     UUID(),
     @T_ID,
-    '',
+    'idEscala',
     1,
     OLD.idEscala,
     null
@@ -476,8 +474,7 @@ values(
 END; 
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-DELIMITER 
-CREATE TRIGGER IF NOT EXISTS Aud_Ins_zona
+CREATE TRIGGER Aud_Ins_zona
 BEFORE INSERT ON `alegreMaisLimpo`.`zona` FOR EACH ROW 
 BEGIN
 set
@@ -516,21 +513,21 @@ Auditoria.transacao_data (
 values(
     UUID(),
     @T_ID,
-    '',
+    'idZona',
     1,
     null,
     NEW.idZona
 ),(
     UUID(),
     @T_ID,
-    '',
+    'nome',
     1,
     null,
     NEW.nome
 );
 END; 
 
-CREATE TRIGGER IF NOT EXISTS Aud_upd_zona
+CREATE TRIGGER Aud_upd_zona
 BEFORE UPDATE ON `alegreMaisLimpo`.`zona` FOR EACH ROW 
 BEGIN
 set
@@ -596,7 +593,7 @@ Auditoria.transacao_data (
 END if;
 END;  
 
-CREATE TRIGGER IF NOT EXISTS Aud_Del_zona
+CREATE TRIGGER Aud_Del_zona
 BEFORE DELETE ON `alegreMaisLimpo`.`zona` FOR EACH ROW 
 BEGIN
 set
